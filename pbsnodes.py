@@ -1,5 +1,6 @@
 #!/usr/sbin/env python
 
+from __future__ import print_function
 import os
 from collections import OrderedDict
 
@@ -44,20 +45,20 @@ for node in nodeList:
 
         print('   LoadAverage = {0}'.format(detail['loadave']), end='\t')
         totalMem, availMem = int(detail['totmem'][0:-2]), int(detail['availmem'][0:-2])
-        usedMem = totalMem-availMem
-        print('Memory Used = {0:8}MB  ['.format(round(usedMem/1024, 2)), end='')
+        usedMem = float(totalMem-availMem)
+        print('Memory Used = {0:8.2f}MB  ['.format(round(usedMem/1024, 2)), end='')
 
         usedPercent = round(usedMem/totalMem*100, 2)
         if usedPercent >= 75 : print('\x1b[1;31;40m', end='');
         elif usedPercent >= 50 : print('\x1b[1;33;40m', end='');
-        elif usedPercent >= 25 : print('\x1b[1;36;40m', end='');
+        elif usedPercent >= 25 : print('\x1b[1;34;40m', end='');
         else :  print('\x1b[1;32;40m', end='');
 
-        for ten in range(round(usedPercent/5)):
+        for ten in range(int(round(usedPercent/5))):
                 print('|', end='')
-        for space in range(20-round(usedPercent/5)):
+        for space in range(20-int(round(usedPercent/5))):
                 print(' ', end='')
-        print( '\x1b[0m]  {0}%'.format(usedPercent))
+        print( '\x1b[0m]  {0:5.2f}%'.format(usedPercent))
 
         print('')       ## seperate each line
 
