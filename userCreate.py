@@ -113,7 +113,7 @@ cmd = 'su - '+user
 print(cmd)
 #os.system(cmd)
 
-cmd = 'ssh-keygen -t rsa'
+cmd = 'echo -e "\n\n\n" | ssh-keygen -t rsa'
 print(cmd)
 #os.system(cmd)
 
