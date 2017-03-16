@@ -12,9 +12,9 @@ Get rsync file of ban list at
 banList = '/home/?'
 
 
-for user in file(banList+'list.txt').readline():
+for user in file(banList).readline():
 	## Chk usr whether is online
-	pid = os.popen('who -u | tr -s " " | cut -d " " -f6 ').read()
+	pid = os.popen('who -u | grep '+user+' | tr -s " " | cut -d " " -f6 ').read()
 	os.system('kill -9 '+pid)
 
 	## Make Usr account expired
