@@ -109,15 +109,11 @@ print(cmd)
 
 ## Change to user
 
-cmd = 'su - '+user
+cmd = 'su '+user + ' -c "echo "\n\n\n" | ssh-keygen -t rsa" '
 print(cmd)
 #os.system(cmd)
 
-cmd = 'echo -e "\n\n\n" | ssh-keygen -t rsa'
-print(cmd)
-#os.system(cmd)
-
-cmd = 'cp /home/'+user+'/.ssh/id_rsa.pub /home/'+user+'/.ssh/authorized_keys'
+cmd = 'su '+user + ' -c "cp /home/'+user+'/.ssh/id_rsa.pub /home/'+user+'/.ssh/authorized_keys"'
 print(cmd)
 #os.system(cmd)
 
