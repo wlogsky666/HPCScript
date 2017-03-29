@@ -5,11 +5,11 @@ import subprocess
 
 
 '''
-Get rsync file of ban list at 
+Get rsync file of ban list at/home/wwwsync/input/   
 
 '''
 
-banList = '/home/?'
+banList = '/home/wwwsync/input/banlist.txt'
 
 
 for user in file(banList).readline():
