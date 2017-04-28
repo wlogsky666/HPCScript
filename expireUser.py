@@ -18,9 +18,9 @@ for user in file(lockFile).readline():
         name = rst.split(' ')[0]
         pid = rst.split(' ')[1]
 
-        if name != user.strip(): continue ;
-        print(name, pid)
-        os.system('kill -9 '+pid)
+        if name == user.strip(): 
+	        print(name, pid)
+	        os.system('kill -9 '+pid)
 
         ## Make Usr account expired
         ssh = subprocess.Popen(['ssh', 'master', 'chage -E 0 '+name], shell=False, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
