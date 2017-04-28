@@ -11,7 +11,8 @@ lockFile = 'disable.txt'
 unlockFile = 'enable_aacount.txt'
 
 
-for user in file(lockFile).readline():
+# Lock User
+for user in file(lockFile).readlines():
         ## Chk usr whether is online
         cmd = 'who -u | tr -s " " | cut -d " " -f1,6'
         rst = os.popen(cmd).read()
@@ -27,3 +28,13 @@ for user in file(lockFile).readline():
 
         ## Rename Usr's authorized_keys in /home/USER/.ssh
         os.popen('mv /home/'+name+'/.ssh/authorized_keys /home/'+name+'/.ssh/expire_keys' )
+
+
+
+for user in file(unlockFile).readlines():
+
+		## Make Usr account active
+        ssh = subprocess.Popen(['ssh', 'master', 'chage -E -1 '+name], shell=False, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
+        ## Rename Usr's authorized_keys in /home/USER/.ssh
+        os.popen('mv /home/'+name+'/.ssh/expire_keys /home/'+name+'/.authorized_keys' )
