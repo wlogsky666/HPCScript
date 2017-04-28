@@ -13,11 +13,17 @@ unlockFile = 'enable_aacount.txt'
 
 for user in file(lockFile).readline():
         ## Chk usr whether is online
-        pid = os.popen('who -u | grep '+user+' | tr -s " " | cut -d " " -f6 ').read()
+        cmd = 'who -u | tr -s " " | cut -d " " -f1,6'
+        rst = os.popen(cmd).read()
+        name = rst.split(' ')[0]
+        pid = rst.split(' ')[1]
+
+        if name != user.strip(): continue ;
+        print(name, pid)
         os.system('kill -9 '+pid)
 
         ## Make Usr account expired
-        ssh = subprocess.Popen(['ssh', 'master', 'chage -E 0'+user], shell=False, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        ssh = subprocess.Popen(['ssh', 'master', 'chage -E 0 '+name], shell=False, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
         ## Rename Usr's authorized_keys in /home/USER/.ssh
-        ssh = subprocess.Popen(['ssh', 'master', 'mv /home/'+user+'/.ssh/authorized_keys /home/'+user+'/.ssh/expire_keys'])
+        os.popen('mv /home/'+name+'/.ssh/authorized_keys /home/'+name+'/.ssh/expire_keys' )
