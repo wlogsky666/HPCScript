@@ -12,12 +12,10 @@ Node = { node.strip() for node in os.popen('pbsnodes -l all | cut -d" " -f1')}
 #Load from Json
 with open('SendTimes.json', 'r') as st :
 	sendTimes = json.load(st)
-
+	
 #Check node state
-for line in os.popen('pbsnodes -l all | tr -s " "').readlines():
-        nodeName, state = line.strip().split(' ')
-        if state.strip() == 'free' or state == 'job-exclusive' :
-                Node.remove(nodeName)
+Active = { line.strip() for line in os.popen('pbsnodes -l up | cut -d" " -f1').readlines()}
+Node = Node.difference(Active)
 
 chk = False
 ## Produce Mail Content
