@@ -7,9 +7,7 @@ import json
 Mail = { address.strip() for address in file('MailAddress').readlines() if len(address.strip()) > 0 }
 
 #NodeList 
-Node = {'node'+str(i) for i in range(1, 45)}
-Node.update({'bigmem'+str(i) for i in range(1, 7)})
-Node.update({'gpu'+str(i) for i in range(1, 3)})
+Node = { node.strip() for node in os.popen('pbsnodes -l all | cut -d" " -f1')}
 
 #Load from Json
 with open('SendTimes.json', 'r') as st :
@@ -17,29 +15,27 @@ with open('SendTimes.json', 'r') as st :
 
 #Check node state
 for line in os.popen('pbsnodes -l all | tr -s " "').readlines():
-        nodeName, state = line.strip().split(' ')[0:2]
+        nodeName, state = line.strip().split(' ')
         if state.strip() == 'free' or state == 'job-exclusive' :
                 Node.remove(nodeName)
 
 chk = False
 ## Produce Mail Content
-TEXT = file('MailText', 'w')
+with open('MailText', 'w') as TEXT :
 
-TEXT.write('***************************************************************\n')
-TEXT.write('  								   \n')
-TEXT.write('                   Notice from NTNU HPC !                      \n')
-TEXT.write('                                                               \n')
-TEXT.write('***************************************************************\n')
-TEXT.write('\n')
+ 	TEXT.write('***********************************************************\n')
+        TEXT.write('                                                           \n')
+        TEXT.write('                  Notice from NTNU HPC !                   \n')
+        TEXT.write('                                                           \n')
+        TEXT.write('***********************************************************\n')
+        TEXT.write('\n')
 
-for downNode in Node:
-	sendTimes[downNode] = sendTimes[downNode]+1
-	print downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n'
+	for downNode in Node:
+		sendTimes[downNode] = sendTimes[downNode]+1
+		print downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n'
 
-	if sendTimes[downNode] <= 3 : chk = True ;
-	TEXT.write(downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n')
-
-TEXT.close()
+		if sendTimes[downNode] <= 3 : chk = True ;
+		TEXT.write(downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n')
 
 ## Mail to administrator
 if chk :
