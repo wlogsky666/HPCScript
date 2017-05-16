@@ -15,20 +15,11 @@ Node.update({'gpu'+str(i) for i in range(1, 3)})
 with open('SendTimes.json', 'r') as st :
 	sendTimes = json.load(st)
 
-chk = False
-
-for line in os.popen('pbsnodes -a').readlines():
-	if not line.startswith(' '):
-		NodeName = line.strip()
-		chk = True
-	elif chk == True :
-		if line.strip().startswith('state '):
-			para = line.strip().split(' ')
-			state = para[2]
-			if state == 'free' or state == 'job-exclusive':
-				Node.remove(NodeName)
-			chk = False
-	else : continue ;
+#Check node state
+for line in os.popen('pbsnodes -l all | tr -s " "').readlines():
+        nodeName, state = line.strip().split(' ')[0:2]
+        if state.strip() == 'free' or state == 'job-exclusive' :
+                Node.remove(nodeName)
 
 chk = False
 ## Produce Mail Content
