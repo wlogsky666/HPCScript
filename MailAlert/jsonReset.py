@@ -1,15 +1,16 @@
 import json
+import os
 
-
-Node = {'node'+str(i) for i in range(1, 45)}
-Node.update({'bigmem'+str(i) for i in range(1, 7)})
-Node.update({'gpu'+str(i) for i in range(1, 3)})
-
-nnnnn = dict()
+Node = { node.strip() for node in os.popen('pbsnodes -l all | cut -d" " -f1')}
+NodeTemp = dict()
 
 for n in Node:
-	nnnnn[n] = 0
+        NodeTemp[n] = 0
 
-with open('SendTimes', 'w') as st:
-	json.dump(nnnnn, st)
+NodeTemp['oss1'] = 0
+NodeTemp['oss2'] = 0
+NodeTemp['mds']  = 0
 
+
+with open('SendTimes.json', 'w') as st:
+        json.dump(NodeTemp, st)
