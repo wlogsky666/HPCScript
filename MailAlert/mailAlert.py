@@ -11,19 +11,33 @@ LOG.write("\n=================\n")
 LOG.write(TIME)
 LOG.write("\n=================\n")
 
-#MailList
-Mail = { address.strip() for address in file('MailAddress').readlines() if len(address.strip()) > 0 }
+# MailList
+Mail = { address.strip() for address in file('/home/wlwu/tool/MailAlert/MailAddress').readlines() if len(address.strip()) > 0 }
 
-#NodeList 
-Node = { node.strip() for node in os.popen('pbsnodes -l all | cut -d" " -f1')}
+# NodeList
+Node = { node.strip() for node in os.popen('/usr/local/bin/pbsnodes -l all | /usr/bin/cut -d" " -f1')}
+Node.update(['oss1', 'oss2', 'mds'])
 
-#Load from Json
-with open('SendTimes.json', 'r') as st :
-	sendTimes = json.load(st)
-	
-#Check node state
-Active = { line.strip() for line in os.popen('pbsnodes -l up | cut -d" " -f1').readlines()}
-Node = Node.difference(Active)
+# Load from Json
+with open('/home/wlwu/tool/MailAlert/SendTimes.json', 'r') as st :
+        sendTimes = json.load(st)
+
+# Check node
+Active = { line.strip() for line in os.popen('/usr/local/bin/pbsnodes -l up | /usr/bin/cut -d" " -f1').readlines()}
+Node = Node - Active
+
+# Check lustre
+TRY = 2
+OSS1_Latency, OSS2_Latency, MDS_Latency = False, False, False
+##oss1
+S = os.popen('ping -c '+str(TRY)+' oss1 | tail -n 2 | head -n 1 | cut -d"," -f2 | cut -d" " -f2').readlines()[0]
+if int(S.strip()) == TRY : Node.remove('oss1')
+##oss2
+S = os.popen('ping -c '+str(TRY)+' oss2 | tail -n 2 | head -n 1 | cut -d"," -f2 | cut -d" " -f2').readlines()[0]
+if int(S.strip()) == TRY : Node.remove('oss2')
+##mds
+S = os.popen('ping -c '+str(TRY)+' oss1 | tail -n 2 | head -n 1 | cut -d"," -f2 | cut -d" " -f2').readlines()[0]
+if int(S.strip()) == TRY : Node.remove('mds')
 
 chk = False
 ## Produce Mail Content
@@ -38,15 +52,17 @@ with open('/home/wlwu/tool/MailAlert/MailText', 'w') as TEXT :
 
         for downNode in Node:
                 sendTimes[downNode] = sendTimes[downNode]+1
-                LOG.write(downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n')
+                period = int(sendTimes[downNode])*10
+                LOG.write(downNode+' has been offline for '+str(period/60)+' hours '+str(period%60)+' minutes\n')
 
                 if sendTimes[downNode] <= 3 : chk = True ;
-                TEXT.write(downNode+' has been offline for '+str(sendTimes[downNode]*10)+' minutes\n')
+                TEXT.write(downNode+' has been offline for '+str(period/60)+' hours '+str(period%60)+' minutes\n')
+
 
 ## Mail to administrator
 if chk :
         for address in Mail:
-                os.popen('cat MailText | mail -s "Notification!!" '+address)
+                 os.popen('/usr/bin/cat /home/wlwu/tool/MailAlert/MailText | /usr/bin/mail -s "Notification" '+address)
                 LOG.write('Send notification to '+address)
 elif len(Node) > 0 :
         LOG.write('Already offline over 30 minutes, skip...\n')
