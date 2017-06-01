@@ -49,13 +49,17 @@ if chk :
                 os.popen('cat MailText | mail -s "Notification!!" '+address)
                 LOG.write('Send notification to '+address)
 elif len(Node) > 0 :
-        LOG.write('Already offline over 30 minutes, skip...')
+        LOG.write('Already offline over 30 minutes, skip...\n')
 else :
-        LOG.write('All green!')
+        LOG.write('All green!\n')
 
 ##Refresh Json
 for r in sendTimes :
-        if not r in Node : sendTimes[r] = 0 ;
+        if not r in Node :
+                if sendTimes[r] != 0 :
+                        LOG.write( r + ' is online now !' )
+                sendTimes[r] = 0 ;
+
 
 ## Dump to Json
 with open('/home/wlwu/tool/MailAlert/SendTimes.json', 'w') as st :
